@@ -1,0 +1,58 @@
+class Solution {
+    private double diffArea(int[][] squares , double y_cut){
+        double aboveArea = 0.0;
+        double belowArea = 0.0;
+
+        for(int[] sq : squares){
+            double b = sq[1];
+            double l = sq[2];
+            double t = b + l;
+            double area = l * l;
+
+            if(b >= y_cut){
+                // sq lies above y-cut
+                aboveArea += area;
+            }else if(y_cut >= t){
+                // sq lies below y-cut
+                belowArea += area;
+            }else{
+                // sq lies between y_cut
+                double heightAboveArea = (t - y_cut) * l;
+                double heightBelowArea = (y_cut - b) * l;
+
+                aboveArea += heightAboveArea;
+                belowArea += heightBelowArea;
+            }
+        }
+        return aboveArea - belowArea;
+    }
+    public double separateSquares(int[][] squares) {
+
+        // 1-> find range
+        double minY = Double.MAX_VALUE;
+        double maxY = Double.MIN_VALUE;
+
+        for(int[] sq : squares){  //[x , b , l]
+            double b = sq[1];
+            double l = sq[2];
+
+            minY = Math.min(minY , b);
+            maxY = Math.max(maxY , b + l);
+        }
+
+        // write binary search
+        while(maxY - minY > 1e-6){ // 1e-5 tak ka precison required
+            double y_cut = (minY + maxY) / 2.0;
+            if(diffArea(squares , y_cut) > 0){
+                // above - below  > 0
+                minY = y_cut; // low = mid
+            }else{
+                // above - below < 0
+                maxY = y_cut; // high = mid
+            }
+        }
+        return minY;
+
+
+    }
+}
